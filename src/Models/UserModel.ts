@@ -1,20 +1,13 @@
 import Model from '../Core/Model/Model'
-import * as Joi from "joi"
 
 class User extends Model{
   constructor(){
-    super(Joi.object({
-      firstname: Joi.string().required(),
-      lastname: Joi.string().required(),
-      email: Joi.string().email().required(),
-      phone: Joi.string().required(),
-      gender: Joi.string().required(),
-      birthday: Joi.date().iso(),
-      password: Joi.string().required(),
-      image: Joi.string(),
-      verified: Joi.number().default(0),
-      push_token: Joi.string()
-    }),
+    super([
+      { property: 'firstname', type: 'string', required: true },
+      { property: 'lastname', type: 'string', required: true },
+      { property: 'email', type: 'email', required: true },
+      { property: 'password', type: 'string', required: true }
+    ],
     'User'
     )
   }
