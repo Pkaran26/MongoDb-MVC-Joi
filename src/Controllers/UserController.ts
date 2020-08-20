@@ -52,6 +52,12 @@ class UserController {
     await next()
   }
 
+  getUsers2 = async (ctx: Koa.Context, next: ()=> Promise<any>): Promise<any> => {
+    const result: any[] = await this._user.tryAggregate()
+    ctx.body = result
+    await next()
+  }
+
 }
 
 export default UserController

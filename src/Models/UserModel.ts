@@ -10,6 +10,11 @@ class User extends Model{
     ], 'User')
   }
   //own function here...
+
+  tryAggregate = async ()=>{
+    const db: any = await this.getDBConnection()
+    return await db.aggregate([]).toArray()
+  }
 }
 
 export default User

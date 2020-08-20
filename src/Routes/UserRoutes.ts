@@ -9,6 +9,7 @@ const userRouter = new Router({
 const _user = new UserController()
 
 userRouter.get('/', authenticateToken, _user.getUsers )
+userRouter.get('/2', authenticateToken, _user.getUsers2 )
 userRouter.post('/', _user.createUser )
 userRouter.post('/multi', _user.createManyUser )
 userRouter.post('/login', _user.login)
