@@ -89,7 +89,7 @@ class Model {
   }
 
   async getDBConnection() {
-    return await this._dbPool
+    return await this._dbPool.collection(this.coll_name)
   }
 
   async create(payload: Object) {
