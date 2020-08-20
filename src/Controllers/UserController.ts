@@ -1,5 +1,6 @@
 import User from '../Models/UserModel';
 import * as Koa from 'koa';
+import { defaultQueryParser } from '../Core/RequestMiddleware/Request'
 
 class UserController {
   constructor(private _user: User = new User()){
@@ -7,7 +8,8 @@ class UserController {
 
   getUsers = async (ctx: Koa.Context, next: ()=> Promise<any>): Promise<any> => {
     const payload = ctx.request.body
-    const result: any[] = await this._user.find(payload)
+    const { limit, skip } = defaultQueryParser(ctx.query)
+    const result: any[] = await this._user.find(payload, limit, skip)
     ctx.body = result
     await next()
   }
@@ -25,6 +27,7 @@ class UserController {
     ctx.body = result
     await next()
   }
+
 }
 
 export default UserController
