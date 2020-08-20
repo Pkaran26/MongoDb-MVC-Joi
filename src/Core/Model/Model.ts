@@ -85,7 +85,7 @@ class Model {
       const result = await this.find(value)
       return result && result.length>0? false : true
     }
-    return false
+    return true
   }
 
   async getDBConnection() {
@@ -139,9 +139,33 @@ class Model {
     }
   }
 
-  async findOne(payload: Object) {
+  generateLookup = (populate: string[]): any[]=>{
+    let lookup = []
+    for (let i = 0; i < populate.length; i++) {
+      for (let j = 0; j < this.properties.length; j++) {
+        if(this.properties[j].property == populate[i] && this.properties[j].ref){
+          lookup = [...lookup, {
+            $lookup: {
+              from: this.properties[j].ref,
+              localField: populate[i],
+              foreignField: '_id',
+              as: populate[i]
+            }
+          }]
+        }
+      }
+    }
+    console.log(lookup)
+    return lookup
+  }
+
+  async findOne(payload: Object, populate?: string[]) {
     try {
-      return await this._dbPool.collection(this.coll_name).findOne(payload)
+      const lookup = this.generateLookup(populate)
+      return await this._dbPool.collection(this.coll_name).aggregate([
+        { $match: payload },
+        ...lookup
+      ]).toArray()
     } catch (error) {
       return error
     }
@@ -150,7 +174,7 @@ class Model {
   async findById(id: any) {
     try {
       id = new ObjectId(id)
-      return await this._dbPool.collection(this.coll_name).findOne(id)
+      return await this._dbPool.collection(this.coll_name).findById(id)
     } catch (error) {
       return error
     }
