@@ -124,13 +124,15 @@ class Model {
     }
   }
 
-  async find(payload?: Object, limit?: number, skip?: number) {
+  async find(payload?: Object, limit?: number, skip?: number, populate?: string[]) {
     try {
       payload = payload ? payload : {}
       limit = limit ? limit : 10
       skip = skip ? skip : 0
+      const lookup = this.generateLookup(populate)
       return await this._dbPool.collection(this.coll_name).aggregate([
         { $match: payload },
+        ...lookup,
         { $limit: limit },
         { $skip: skip }
       ]).toArray()
