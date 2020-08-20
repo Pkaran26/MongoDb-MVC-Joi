@@ -1,6 +1,6 @@
 import * as Joi from "joi";
 import { ObjectId } from 'mongodb';
-import DBPool from '../../Config/database';
+import DBPool from '../Database/Database';
 
 const DEFAULT = {
   date_added: Joi.date().iso().default(new Date()),

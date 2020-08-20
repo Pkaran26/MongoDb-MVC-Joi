@@ -1,8 +1,9 @@
 import { MongoClient } from 'mongodb'
+import { MONGODB_URL } from '../Config'
 
 const DBPool = async () => {
   const client = await MongoClient.connect(
-    'mongodb://localhost:27017',
+    MONGODB_URL,
     {
       useUnifiedTopology: true,
       useNewUrlParser: true
