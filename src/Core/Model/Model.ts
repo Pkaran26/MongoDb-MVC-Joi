@@ -48,8 +48,8 @@ class Model {
     }
   }
 
-  private validateJson(payload: Object){
-    const { value } = this._validator.validate(payload)
+  private validateJson(payload: Object, type?: boolean){
+    const { value } = type? this._update_validator.validate(payload) : this._validator.validate(payload)
     return value? value : { error: 'validation error' }
   }
 
@@ -126,7 +126,7 @@ class Model {
   }
 
   async updateOne(id: string, payload: Object) {
-    const value = this.validateJson(payload)
+    const value = this.validateJson(payload, true)
     if (!value) return { error: 'validation error' }
     try {
       return await this._dbPool.collection(this.coll_name).updateOne(
