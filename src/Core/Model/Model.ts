@@ -9,6 +9,7 @@ const DEFAULT = {
 
 class Model {
   private properties: any[];
+  private unique: any[];
   private _validator: Joi.Schema;
   private _update_validator: Joi.Schema;
   private _dbPool: any;
@@ -18,6 +19,7 @@ class Model {
     this.properties = properties
     this.coll_name = coll_name;
     this.createSchema()
+    this.setUnique()
     this.setDbConnection()
   }
 
@@ -48,9 +50,9 @@ class Model {
     }
   }
 
-  private validateJson(payload: Object, type?: boolean){
-    const { value } = type? this._update_validator.validate(payload) : this._validator.validate(payload)
-    return value? value : { error: 'validation error' }
+  private validateJson(payload: Object, type?: boolean) {
+    const { value } = type ? this._update_validator.validate(payload) : this._validator.validate(payload)
+    return value ? value : { error: 'validation error' }
   }
 
   private async setDbConnection() {
@@ -61,21 +63,50 @@ class Model {
     }
   }
 
+  private setUnique() {
+    let unique = []
+    this.properties.map((e) => {
+      if (e.unique == true) {
+        unique = [...unique, e.property]
+      }
+    })
+    this.unique = unique
+  }
+
+  private async checkUnique(payload: Object): Promise<any>{
+    if (this.unique.length > 0) {
+      let value = {}
+      for (let i = 0; i < this.unique.length; i++) {
+        value = {
+          ...value,
+          [this.unique[i]]: payload[this.unique[i]]
+        }
+      }
+      const result = await this.find(value)
+      return result && result.length>0? false : true
+    }
+    return false
+  }
+
   async getDBConnection() {
     return await this._dbPool
   }
 
   async create(payload: Object) {
     const value = this.validateJson(payload)
-    console.log(value)
     if (!value) return { error: 'validation error' }
-    try {
-      return await this._dbPool.collection(this.coll_name).insertOne({
-        ...value
-      })
-    } catch (error) {
-      console.log(error)
-      return error
+    const flg: boolean = await this.checkUnique(value)
+    if(flg){
+      try {
+        return await this._dbPool.collection(this.coll_name).insertOne({
+          ...value
+        })
+      } catch (error) {
+        console.log(error)
+        return error
+      }
+    } else {
+      return { status: false, message: 'data already exist', keys: this.unique }
     }
   }
 
@@ -141,7 +172,7 @@ class Model {
   async updateMany(filter: Object, payload: Object) {
     const filtered = this.validateJson(filter)
     const value = this.validateJson(payload)
-    if (!value || !filtered ) return { error: 'validation error' }
+    if (!value || !filtered) return { error: 'validation error' }
     try {
       return await this._dbPool.collection(this.coll_name).updateMany(
         filter,
