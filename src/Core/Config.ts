@@ -4,3 +4,4 @@ export const REFRESH_SECRET = '76C834FEB2D04651BC80555A21187AC46C5B2C3F019F75BF6
 export const LIMIT = 10;
 export const SKIP = 0;
 export const EXPIRES_IN = '7h';
+export const REF_EXPIRES_IN = '24h';
