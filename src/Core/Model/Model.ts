@@ -124,23 +124,6 @@ class Model {
     }
   }
 
-  async find(payload?: Object, limit?: number, skip?: number, populate?: string[]) {
-    try {
-      payload = payload ? payload : {}
-      limit = limit ? limit : 10
-      skip = skip ? skip : 0
-      const lookup = this.generateLookup(populate)
-      return await this._dbPool.collection(this.coll_name).aggregate([
-        { $match: payload },
-        ...lookup,
-        { $limit: limit },
-        { $skip: skip }
-      ]).toArray()
-    } catch (error) {
-      return error
-    }
-  }
-
   generateLookup = (populate: string[]): any[]=>{
     let lookup = []
     for (let i = 0; i < populate.length; i++) {
@@ -159,6 +142,23 @@ class Model {
     }
     console.log(lookup)
     return lookup
+  }
+
+  async find(payload?: Object, limit?: number, skip?: number, populate?: string[]) {
+    try {
+      payload = payload ? payload : {}
+      limit = limit ? limit : 10
+      skip = skip ? skip : 0
+      const lookup = this.generateLookup(populate)
+      return await this._dbPool.collection(this.coll_name).aggregate([
+        { $match: payload },
+        ...lookup,
+        { $limit: limit },
+        { $skip: skip }
+      ]).toArray()
+    } catch (error) {
+      return error
+    }
   }
 
   async findOne(payload: Object, populate?: string[]) {
