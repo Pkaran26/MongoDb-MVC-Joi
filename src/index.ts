@@ -1,12 +1,14 @@
-import app from './Core/index'
-import userRouter from './Routes/UserRoutes'
-import profileRouter from './Routes/ProfileRoutes'
+import app from './Core/App'
+import { PORT } from './Core/Config'
 
-const PORT = 3000;
+import categoryRouter from './Category/Router'
+import blogRouter from './Blog/Router'
+import commentRouter from './Blog/Comment/Router'
+
+app.use(categoryRouter.routes()).use(categoryRouter.allowedMethods())
+app.use(commentRouter.routes()).use(commentRouter.allowedMethods())
+app.use(blogRouter.routes()).use(blogRouter.allowedMethods())
 
 app.listen(PORT, ()=>{
   console.log('server running...')
 })
-
-app.use( userRouter.routes() ).use( userRouter.allowedMethods() );
-app.use( profileRouter.routes() ).use( profileRouter.allowedMethods() );
